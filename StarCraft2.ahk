@@ -99,6 +99,8 @@ CapsLock & Numpad9::SC2.ToggleMarine()
 ; Templar is in group 0
 CapsLock & Numpad0::SC2.ToggleTemplar()
 
+CapsLock & Numpad5::SC2.ToggleSpectreStun()
+
 
 class SC2
 {
@@ -121,6 +123,7 @@ class SC2
     static medicMillis := 2000
     static marineMillis := 15000
     static templarMillis := 4000
+    static spectreStunMillis := 3001
 
 
     ; Save mouse position to use in SC2
@@ -129,8 +132,8 @@ class SC2
         MouseGetPos, xPos, yPos
         this.tankxPos := xPos
         this.tankyPos := yPos
-        this.casterxPos := xPos + 188    ; compared to the center: a little bit to the right
-        this.casteryPos := yPos - 120    ; compared to the center: a little bit upper
+        this.casterxPos := xPos + 288    ; compared to the center: a little bit to the right
+        this.casteryPos := yPos ;- 120    ; compared to the center: a little bit upper
 
         msg :=
         (Join
@@ -180,6 +183,11 @@ class SC2
     ToggleTemplar()
     {
         ToggleTimerAndShowTooltip("SC2.Templar", this.templarMillis, SC2.Templar.Bind(SC2))
+    }
+
+    ToggleSpectreStun()
+    {
+        ToggleTimerAndShowTooltip("SC2.SpectreStun", this.spectreStunMillis, SC2.SpectreStun.Bind(SC2))
     }
 
     DragoonQ()
@@ -264,6 +272,36 @@ class SC2
         ControlSend,, {Blind}{Raw}2weqh, % this.ahk_SC2
     }
 
+    SpectreStun()
+    {
+        Critical
+
+        SetKeyDelay, 20, 10
+        SetControlDelay 30
+
+        if (WinActive(this.ahk_SC2)) {
+            Tippy("SpectreStun",, 5)
+            if(this.tankxPos = 0){
+                this.SaveMousePosition()
+            }
+        }
+
+        ; use the saved position
+        x := this.casterxPos
+        y := this.casteryPos
+
+        ; x := this.tankxPos + 120
+        ; y := this.tankyPos
+
+        ; ControlClick, must have the coordinates as "x100 y100", not just "100 100"
+        x := "x" . x
+        y := "y" . y
+
+        ControlSend,, {Blind}{Raw}2r, % this.ahk_SC2
+        ControlClick,, % this.ahk_SC2,, LEFT, 1, %  "NA" x y
+        ControlSend,, {Blind}{Raw}2h, % this.ahk_SC2
+    }
+
     CenturionPlay()
     {
         Critical
@@ -325,6 +363,8 @@ class SC2
         x := "x" . x
         y := "y" . y
 
+        ControlSend,, {Blind}{Raw}0w, % this.ahk_SC2
+        ControlClick,, % this.ahk_SC2,, LEFT, 1, %  "NA" x y
         ControlSend,, {Blind}{Raw}0q, % this.ahk_SC2
         ControlClick,, % this.ahk_SC2,, LEFT, 1, %  "NA" x y
         ControlSend,, {Blind}{Raw}0h, % this.ahk_SC2
